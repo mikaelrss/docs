@@ -2,6 +2,7 @@ const next = require('next')
 const qs = require('querystring')
 const url = require('url')
 const ms = require('ms')
+const cookie = require('cookie')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -54,22 +55,34 @@ async function main(req, res, parsedUrl) {
   }
 
   const isNext = parsedUrl.path.includes('/_next/')
+  const cookies = cookie.parse(req.headers.cookie || '')
 
   // In development we don't cache
   // When the user is logged in we don't cache
   // When the request is internal to Next.js we call handle immediately as Next.js will handle setting maxage
-  if (dev || (req.headers.cookie || '').includes('token=') || isNext) {
+  if (dev || cookie.token || isNext) {
     // If the user is logged in, do not cache
-    if (!req.cookies['_now_no_cache']) {
-      res.cookie('_now_no_cache', 1, { maxAge: ms('20 years') })
+    if (cookies.token && !cookies['_now_no_cache']) {
+      res.setHeader(
+        'Set-Cookie',
+        cookie.serialize('_now_no_cache', 1, { maxAge: ms('20 years') })
+      )
+    } else if (!cookies.token && cookies['_now_no_cache']) {
+      res.setHeader(
+        'Set-Cookie',
+        cookie.serialize('_now_no_cache', 0, { maxAge: 0 })
+      )
     }
 
     return handle(req, res, parsedUrl)
   }
 
   // If the user is not logged in, allow caching
-  if (req.cookies['_now_no_cache']) {
-    res.clearCookie('_now_no_cache')
+  if (cookies['_now_no_cache']) {
+    res.setHeader(
+      'Set-Cookie',
+      cookie.serialize('_now_no_cache', 0, { maxAge: 0 })
+    )
   }
 
   // s-maxage will cause Now CDN to cache the page for 1 hour (3600 seconds)
