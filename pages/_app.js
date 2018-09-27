@@ -11,12 +11,6 @@ export default class MyApp extends App {
       pageProps = await Component.getInitialProps(ctx)
     }
 
-    // We don't need to do any auth logic for static export
-    const isServer = typeof window === 'undefined'
-    if (isServer && !req.headers) {
-      return { pageProps }
-    }
-
     const { user } = await authenticate({ req })
     return { pageProps, user }
   }
