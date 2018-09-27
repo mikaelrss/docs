@@ -60,7 +60,7 @@ async function main(req, res, parsedUrl) {
   // In development we don't cache
   // When the user is logged in we don't cache
   // When the request is internal to Next.js we call handle immediately as Next.js will handle setting maxage
-  if (dev || cookie.token || isNext) {
+  if (dev || cookies.token || isNext) {
     // If the user is logged in, do not cache
     if (cookies.token && !cookies['_now_no_cache']) {
       res.setHeader(
