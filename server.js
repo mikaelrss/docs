@@ -65,12 +65,15 @@ async function main(req, res, parsedUrl) {
     if (cookies.token && !cookies['_now_no_cache'] && !isNext) {
       res.setHeader(
         'Set-Cookie',
-        cookie.serialize('_now_no_cache', 1, { maxAge: ms('20 years') })
+        cookie.serialize('_now_no_cache', 1, {
+          path: '/',
+          maxAge: ms('20 years')
+        })
       )
     } else if (!cookies.token && cookies['_now_no_cache']) {
       res.setHeader(
         'Set-Cookie',
-        cookie.serialize('_now_no_cache', 0, { maxAge: 0 })
+        cookie.serialize('_now_no_cache', 0, { path: '/', maxAge: 0 })
       )
     }
 
@@ -81,7 +84,7 @@ async function main(req, res, parsedUrl) {
   if (cookies['_now_no_cache']) {
     res.setHeader(
       'Set-Cookie',
-      cookie.serialize('_now_no_cache', 0, { maxAge: 0 })
+      cookie.serialize('_now_no_cache', 0, { path: '/', maxAge: 0 })
     )
   }
 
