@@ -62,7 +62,7 @@ async function main(req, res, parsedUrl) {
   // When the request is internal to Next.js we call handle immediately as Next.js will handle setting maxage
   if (dev || cookies.token || isNext) {
     // If the user is logged in, do not cache
-    if (cookies.token && !cookies['_now_no_cache']) {
+    if (cookies.token && !cookies['_now_no_cache'] && !isNext) {
       res.setHeader(
         'Set-Cookie',
         cookie.serialize('_now_no_cache', 1, { maxAge: ms('20 years') })
